@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
 import de.gecko.medicats.ops.OpsNode;
 
 public class SgmlOpsNode extends OpsNode {
+
     public static SgmlOpsNode createNode(SgmlOpsNode parent,
                                          Element element,
                                          String label,
@@ -18,7 +19,8 @@ public class SgmlOpsNode extends OpsNode {
                                          List<String> inclusionCodes,
                                          List<String> exclusionCodes,
                                          List<String> inclusionStrings,
-                                         List<String> exclusionStrings) {
+                                         List<String> exclusionStrings,
+                                         List<String> hints) {
         SgmlOpsNode node = new SgmlOpsNode(Objects.requireNonNull(parent, "parent"),
                 Objects.requireNonNull(element, "element"),
                 Objects.requireNonNull(label, "label"),
@@ -27,7 +29,8 @@ public class SgmlOpsNode extends OpsNode {
                 Objects.requireNonNull(inclusionCodes, "inclusionCodes"),
                 Objects.requireNonNull(exclusionCodes, "exclusionCodes"),
                 Objects.requireNonNull(inclusionStrings, "inclusionStrings"),
-                Objects.requireNonNull(exclusionStrings, "exclusionStrings"));
+                Objects.requireNonNull(exclusionStrings, "exclusionStrings"),
+                Objects.requireNonNull(hints, "hints"));
 
         if (code.isEmpty())
             throw new IllegalArgumentException("code is empty");
@@ -42,7 +45,8 @@ public class SgmlOpsNode extends OpsNode {
                                          String code,
                                          OpsNodeType nodeType,
                                          Pair<List<String>, List<String>> inclusions,
-                                         Pair<List<String>, List<String>> exclusions) {
+                                         Pair<List<String>, List<String>> exclusions,
+                                         List<String> hints) {
         return createNode(parent,
                 element,
                 label,
@@ -51,7 +55,8 @@ public class SgmlOpsNode extends OpsNode {
                 inclusions.getFirst(),
                 exclusions.getFirst(),
                 inclusions.getSecond(),
-                exclusions.getSecond());
+                exclusions.getSecond(),
+                hints);
     }
 
     private final Element element;
@@ -64,8 +69,10 @@ public class SgmlOpsNode extends OpsNode {
     private final List<String> inclusionStrings;
     private final List<String> exclusionStrings;
 
+    private final List<String> hints;
+
     protected SgmlOpsNode(OpsNode parent, Element element, String label, String code, OpsNodeType nodeType,
-                          List<String> inclusionCodes, List<String> exclusionCodes, List<String> inclusionStrings, List<String> exclusionStrings) {
+                          List<String> inclusionCodes, List<String> exclusionCodes, List<String> inclusionStrings, List<String> exclusionStrings, List<String> hints) {
         super(parent);
 
         this.element = element;
@@ -76,6 +83,7 @@ public class SgmlOpsNode extends OpsNode {
         this.exclusionCodes = exclusionCodes;
         this.inclusionStrings = inclusionStrings;
         this.exclusionStrings = exclusionStrings;
+        this.hints = hints;
     }
 
     public Element getSgmlElement() {
@@ -97,10 +105,12 @@ public class SgmlOpsNode extends OpsNode {
         return nodeType;
     }
 
+    @SuppressWarnings("unused")
     public List<String> getInclusionCodes() {
         return inclusionCodes;
     }
 
+    @SuppressWarnings("unused")
     public List<String> getExclusionCodes() {
         return exclusionCodes;
     }
@@ -111,6 +121,10 @@ public class SgmlOpsNode extends OpsNode {
 
     public List<String> getExclusionStrings() {
         return exclusionStrings;
+    }
+
+    public List<String> getHints() {
+        return hints;
     }
 
     @Override

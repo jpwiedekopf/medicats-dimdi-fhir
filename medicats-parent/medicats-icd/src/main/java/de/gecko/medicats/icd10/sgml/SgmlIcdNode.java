@@ -2,7 +2,6 @@ package de.gecko.medicats.icd10.sgml;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.w3c.dom.Element;
@@ -14,7 +13,7 @@ public class SgmlIcdNode extends IcdNode
 	public static SgmlIcdNode createNode(SgmlIcdNode parent, Element element, String label, String code,
 										 IcdNodeType nodeType, IcdNodeUsage nodeUsage, List<String> inclusionCodes,
 										 List<String> exclusionCodes, List<String> inclusionStrings,
-										 List<String> exclusionStrings)
+										 List<String> exclusionStrings, List<String> hints)
 	{
 		SgmlIcdNode node = new SgmlIcdNode(Objects.requireNonNull(parent, "parent"),
 				Objects.requireNonNull(element, "element"),
@@ -25,7 +24,8 @@ public class SgmlIcdNode extends IcdNode
 				Objects.requireNonNull(inclusionCodes, "inclusionCodes"),
 				Objects.requireNonNull(exclusionCodes, "exclusionCodes"),
 				Objects.requireNonNull(inclusionStrings, "inclusionStrings"),
-				Objects.requireNonNull(exclusionStrings, "exclusionStrings"));
+				Objects.requireNonNull(exclusionStrings, "exclusionStrings"),
+				Objects.requireNonNull(hints, "hints"));
 
 		if (code.isEmpty())
 			throw new IllegalArgumentException("code is empty");
@@ -45,9 +45,10 @@ public class SgmlIcdNode extends IcdNode
 
 	private final List<String> inclusionStrings;
 	private final List<String> exclusionStrings;
+	private final List<String> hints;
 
 	protected SgmlIcdNode(IcdNode parent, Element element, String label, String code, IcdNodeType nodeType,
-						  IcdNodeUsage nodeUsage, List<String> inclusionCodes, List<String> exclusionCodes, List<String> inclusionStrings, List<String> exclusionStrings)
+						  IcdNodeUsage nodeUsage, List<String> inclusionCodes, List<String> exclusionCodes, List<String> inclusionStrings, List<String> exclusionStrings, List<String> hints)
 	{
 		super(parent);
 
@@ -60,6 +61,7 @@ public class SgmlIcdNode extends IcdNode
 		this.exclusionCodes = exclusionCodes;
 		this.inclusionStrings = inclusionStrings;
 		this.exclusionStrings = exclusionStrings;
+		this.hints = hints;
 	}
 
 	public static SgmlIcdNode createNode(SgmlIcdNode parent,
@@ -69,12 +71,13 @@ public class SgmlIcdNode extends IcdNode
 										 IcdNodeType nodeType,
 										 IcdNodeUsage icdNodeUsage,
 										 Map<String, String> inclusions,
-										 Map<String, String> exclusions) {
+										 Map<String, String> exclusions,
+										 List<String> hints) {
 		List<String> inclusionCodes = new ArrayList<>(inclusions.values());
 		List<String> exclusionCodes = new ArrayList<>(exclusions.values());
 		List<String> inclusionStrings = new ArrayList<>(inclusions.keySet());
 		List<String> exclusionStrings = new ArrayList<>(exclusions.keySet());
-		return createNode(parent, chapter, label, code, nodeType, icdNodeUsage, inclusionCodes, exclusionCodes, inclusionStrings, exclusionStrings);
+		return createNode(parent, chapter, label, code, nodeType, icdNodeUsage, inclusionCodes, exclusionCodes, inclusionStrings, exclusionStrings, hints);
 	}
 
 	public Element getSgmlElement()
@@ -120,6 +123,10 @@ public class SgmlIcdNode extends IcdNode
 
 	public List<String> getExclusionStrings() {
 		return exclusionStrings;
+	}
+
+	public List<String> getHints() {
+		return hints;
 	}
 
 	private static class IcdNodesWithExtraUsage

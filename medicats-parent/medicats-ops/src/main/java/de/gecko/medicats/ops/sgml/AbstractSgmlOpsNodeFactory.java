@@ -42,21 +42,30 @@ public abstract class AbstractSgmlOpsNodeFactory extends AbstractOpsNodeFactory 
         return root;
     }
 
-    private Pair<List<String>, List<String>> getExclusionsForNode(Element node) throws IOException {
+    private Pair<List<String>, List<String>> getExclusionsForNode(Element node, String prefix) throws IOException {
         if (node == null) return emptyPair();
-        Element exclusiva = getElementByTagNameOrNull(node, "VINKL");
-        return new Pair<>(parseExclusions(exclusiva), textForInExclusionNodes(exclusiva));
+        String tagname = String.format("%sEXKL", prefix);
+        Element exclusiva = getElementByTagNameOrNull(node, tagname);
+        return new Pair<>(parseExclusions(exclusiva), textForInExclusionNodes(exclusiva, prefix));
     }
 
-    private Pair<List<String>, List<String>> getInclusionsForNode(Element node) throws IOException {
-        if (node == null) return emptyPair();
-        Element inclusiva = getElementByTagNameOrNull(node, "VEXKL");
-        return new Pair<>(parseInclusions(inclusiva), textForInExclusionNodes(inclusiva));
-    }
-
-    private List<String> textForInExclusionNodes(Element node) throws IOException {
+    private List<String> getHintsForNode(Element node, String prefix) throws IOException {
         if (node == null) return Collections.emptyList();
-        List<Element> textElements = getElementsByTagName(node, "VTXT");
+        String tagname = String.format("%sHIN", prefix);
+        return getElementsByTagName(node, tagname).stream().map(this::getTextContentCleaned).collect(Collectors.toList());
+    }
+
+    private Pair<List<String>, List<String>> getInclusionsForNode(Element node, String prefix) throws IOException {
+        if (node == null) return emptyPair();
+        String tagname = String.format("%sINKL", prefix);
+        Element inclusiva = getElementByTagNameOrNull(node, tagname);
+        return new Pair<>(parseInclusions(inclusiva), textForInExclusionNodes(inclusiva, prefix));
+    }
+
+    private List<String> textForInExclusionNodes(Element node, String prefix) throws IOException {
+        if (node == null) return Collections.emptyList();
+        String tagname = String.format("%sTXT", prefix);
+        List<Element> textElements = getElementsByTagName(node, tagname);
         return textElements.stream().map(this::getTextContentCleaned).collect(Collectors.toList());
     }
 
@@ -71,7 +80,7 @@ public abstract class AbstractSgmlOpsNodeFactory extends AbstractOpsNodeFactory 
         String code = getTextContentCleaned(knr);
         String label = getTextContentCleaned(kti);
 
-        SgmlOpsNode node = SgmlOpsNode.createNode(root, kap, label, code, OpsNodeType.CHAPTER, emptyPair(), emptyPair());
+        SgmlOpsNode node = SgmlOpsNode.createNode(root, kap, label, code, OpsNodeType.CHAPTER, emptyPair(), emptyPair(), Collections.emptyList());
 
         NodeList childs = kap.getChildNodes();
         for (int c = 0; c < childs.getLength(); c++) {
@@ -105,24 +114,13 @@ public abstract class AbstractSgmlOpsNodeFactory extends AbstractOpsNodeFactory 
         String label = getTextContentCleaned(dgti);
         String code = parseVonBis(dgrrahm);
 
-        //List<String> inclusions = new ArrayList<>();
-        //List<String> exclusions = new ArrayList<>();
-
         Element dginhalt = getElementByTagNameOrNull(dstgrup, "DGINHALT");
-		/*if (dginhalt != null)
-		{
-			Element dginkl = getElementByTagNameOrNull(dginhalt, "DGINKL");
-			Element dgexkl = getElementByTagNameOrNull(dginhalt, "DGEXKL");
-
-			inclusions.addAll(parseInclusions(dginkl));
-			exclusions.addAll(parseExclusions(dgexkl));
-		}*/
-        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(dginhalt);
-        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(dginhalt);
-
+        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(dginhalt, "DG");
+        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(dginhalt, "DG");
+        List<String> hints = getHintsForNode(dginhalt, "DG");
 
         SgmlOpsNode node = SgmlOpsNode.createNode(parent, dstgrup, label, code, OpsNodeType.BLOCK, inclusions,
-                exclusions);
+                exclusions, hints);
 
         List<Element> dsts = getElementsByTagName(dstgrup, "DST");
         for (Element dst : dsts)
@@ -136,22 +134,14 @@ public abstract class AbstractSgmlOpsNodeFactory extends AbstractOpsNodeFactory 
         String label = getTextContentCleaned(dti);
         String code = getTextContentCleaned(dcode);
 
-       /* List<String> inclusions = new ArrayList<>();
-        List<String> exclusions = new ArrayList<>();*/
+        Element dinhalt = getElementByTagNameOrNull(dst, "DINHALT");
 
-        Element dginhalt = getElementByTagNameOrNull(dst, "DINHALT");
-        /*if (dginhalt != null) {
-            Element dinkl = getElementByTagNameOrNull(dginhalt, "DINKL");
-            Element dexkl = getElementByTagNameOrNull(dginhalt, "DEXKL");
-
-            inclusions.addAll(parseInclusions(dinkl));
-            exclusions.addAll(parseExclusions(dexkl));
-        }*/
-        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(dginhalt);
-        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(dginhalt);
+        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(dinhalt, "D");
+        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(dinhalt, "D");
+        List<String> hints = getHintsForNode(dinhalt, "D");
 
         SgmlOpsNode node = SgmlOpsNode.createNode(parent, dst, label, code, OpsNodeType.CATEGORY, inclusions,
-                exclusions);
+                exclusions, hints);
 
         List<Element> vsts = getElementsByTagName(dst, "VST");
         for (Element vst : vsts)
@@ -165,22 +155,13 @@ public abstract class AbstractSgmlOpsNodeFactory extends AbstractOpsNodeFactory 
         String label = getTextContentCleaned(vti);
         String code = getTextContentCleaned(vcode);
 
-        /*List<String> inclusions = new ArrayList<>();
-        List<String> exclusions = new ArrayList<>();*/
-
         Element vinhalt = getElementByTagNameOrNull(vst, "VINHALT");
-        /*if (vinhalt != null) {
-            Element vinkl = getElementByTagNameOrNull(vinhalt, "VINKL");
-            Element vexkl = getElementByTagNameOrNull(vinhalt, "VEXKL");
-
-            inclusions.addAll(parseInclusions(vinkl));
-            exclusions.addAll(parseExclusions(vexkl));
-        }*/
-        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(vinhalt);
-        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(vinhalt);
+        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(vinhalt, "V");
+        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(vinhalt, "V");
+        List<String> hints = getHintsForNode(vinhalt, "V");
 
         SgmlOpsNode node = SgmlOpsNode.createNode(parent, vst, label, code, OpsNodeType.CATEGORY, inclusions,
-                exclusions);
+                exclusions, hints);
 
         List<Element> fsts = getElementsByTagName(vst, "FST");
         for (Element fst : fsts)
@@ -196,22 +177,13 @@ public abstract class AbstractSgmlOpsNodeFactory extends AbstractOpsNodeFactory 
 
         label = fixFstLabel(label, code, parent);
 
-        /*List<String> inclusions = new ArrayList<>();
-        List<String> exclusions = new ArrayList<>();*/
-
         Element finhalt = getElementByTagNameOrNull(fst, "FINHALT");
-        /*if (finhalt != null) {
-            Element finkl = getElementByTagNameOrNull(finhalt, "FINKL");
-            Element fexkl = getElementByTagNameOrNull(finhalt, "FEXKL");
-
-            inclusions.addAll(parseInclusions(finkl));
-            exclusions.addAll(parseExclusions(fexkl));
-        }*/
-        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(finhalt);
-        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(finhalt);
+        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(finhalt, "F");
+        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(finhalt, "F");
+        List<String> hints = getHintsForNode(finhalt, "F");
 
         SgmlOpsNode node = SgmlOpsNode.createNode(parent, fst, label, code, OpsNodeType.CATEGORY, inclusions,
-                exclusions);
+                exclusions, hints);
 
         List<Element> ssts = getElementsByTagName(fst, "SST");
         for (Element sst : ssts)
@@ -231,21 +203,12 @@ public abstract class AbstractSgmlOpsNodeFactory extends AbstractOpsNodeFactory 
 
         label = fixSstLabel(label, code, parent);
 
-        /*List<String> inclusions = new ArrayList<>();
-        List<String> exclusions = new ArrayList<>();*/
-
         Element sinhalt = getElementByTagNameOrNull(sst, "SINHALT");
-        /*if (sinhalt != null) {
-            Element sinkl = getElementByTagNameOrNull(sinhalt, "SINKL");
-            Element sexkl = getElementByTagNameOrNull(sinhalt, "SEXKL");
+        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(sinhalt, "S");
+        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(sinhalt, "S");
+        List<String> hints = getHintsForNode(sinhalt, "S");
 
-            inclusions.addAll(parseInclusions(sinkl));
-            exclusions.addAll(parseExclusions(sexkl));
-        }*/
-        Pair<List<String>, List<String>> inclusions = getInclusionsForNode(sinhalt);
-        Pair<List<String>, List<String>> exclusions = getExclusionsForNode(sinhalt);
-
-        SgmlOpsNode.createNode(parent, sst, label, code, OpsNodeType.CATEGORY, inclusions, exclusions);
+        SgmlOpsNode.createNode(parent, sst, label, code, OpsNodeType.CATEGORY, inclusions, exclusions, hints);
     }
 
     protected String fixSstLabel(String label, String code, SgmlOpsNode parent) {

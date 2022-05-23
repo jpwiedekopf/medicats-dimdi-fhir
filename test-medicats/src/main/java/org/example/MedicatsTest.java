@@ -31,16 +31,17 @@ public class MedicatsTest
         OpsNodeFactory nodeFactory = opsService.getNodeFactory("ops2004");
         System.out.printf("\tLoaded version: %s%n", nodeFactory.getName());
         OpsNodeWalker nodeWalker = nodeFactory.createNodeWalker();
-        String code = "1-209";
+        String code = "1-207.2";
         SgmlOpsNode targetNode = (SgmlOpsNode) nodeWalker.getNodeByCode(code);
         if (targetNode == null) System.exit(1);
         System.out.printf("\tCode='%s', Display='%s'%n", targetNode.getCode(), targetNode.getLabel());
         System.out.printf("\tInclusions:%n");
         System.out.printf("\t\tcodes=[%s]%n", targetNode.getInclusions(nodeWalker::getNodesBySudoCode).map(OpsNode::getCode).collect(Collectors.joining("; ")));
-        System.out.printf("\t\tstrings=[%s]%n", String.join(", ", targetNode.getInclusionStrings()));
+        System.out.printf("\t\tstrings=[%s]%n", String.join("; ", targetNode.getInclusionStrings()));
         System.out.printf("\tExclusions:%n");
         System.out.printf("\t\tcodes=[%s]%n", targetNode.getExclusions(nodeWalker::getNodesBySudoCode).map(OpsNode::getCode).collect(Collectors.joining("; ")));
-        System.out.printf("\t\tstrings=[%s]%n", String.join(", ", targetNode.getExclusionStrings()));
+        System.out.printf("\t\tstrings=[%s]%n", String.join("; ", targetNode.getExclusionStrings()));
+        System.out.printf("\tHints=[%s]%n", String.join("; ", targetNode.getHints()));
     }
 
     @SuppressWarnings("unused")
@@ -52,7 +53,7 @@ public class MedicatsTest
         IcdNodeWalker nodeWalker = nodeFactory.createNodeWalker();
         Scanner scanner = new Scanner(System.in);
         System.out.printf("\tLoaded version: %s%n", nodeFactory.getName());
-        String code = "A02.2";
+        String code = "A09";
         SgmlIcdNode targetNode = (SgmlIcdNode) nodeWalker.getNodeByCode(code);
         if (targetNode == null) System.exit(1);
         System.out.printf("\tCode='%s', Display='%s'%n", targetNode.getCode(), targetNode.getLabel());
@@ -62,5 +63,6 @@ public class MedicatsTest
         System.out.printf("\tExclusions:%n");
         System.out.printf("\t\tcodes=[%s]%n", String.join("; ", targetNode.getExclusionCodes()));
         System.out.printf("\t\tstrings=[%s]%n", String.join("; ", targetNode.getExclusionStrings()));
+        System.out.printf("\tHints=[%s]%n", String.join("; ", targetNode.getHints()));
     }
 }
