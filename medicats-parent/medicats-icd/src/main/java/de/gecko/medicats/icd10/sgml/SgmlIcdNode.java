@@ -17,11 +17,15 @@ public class SgmlIcdNode extends IcdNode
 										 List<String> exclusionStrings)
 	{
 		SgmlIcdNode node = new SgmlIcdNode(Objects.requireNonNull(parent, "parent"),
-				Objects.requireNonNull(element, "element"), Objects.requireNonNull(label, "label"),
-				Objects.requireNonNull(code, "code"), Objects.requireNonNull(nodeType, "nodeType"),
+				Objects.requireNonNull(element, "element"),
+				Objects.requireNonNull(label, "label"),
+				Objects.requireNonNull(code, "code"),
+				Objects.requireNonNull(nodeType, "nodeType"),
 				Objects.requireNonNull(nodeUsage, "nodeUsage"),
 				Objects.requireNonNull(inclusionCodes, "inclusionCodes"),
-				Objects.requireNonNull(exclusionCodes, "exclusionCodes"), inclusionStrings, exclusionStrings);
+				Objects.requireNonNull(exclusionCodes, "exclusionCodes"),
+				Objects.requireNonNull(inclusionStrings, "inclusionStrings"),
+				Objects.requireNonNull(exclusionStrings, "exclusionStrings"));
 
 		if (code.isEmpty())
 			throw new IllegalArgumentException("code is empty");
@@ -68,9 +72,9 @@ public class SgmlIcdNode extends IcdNode
 										 Map<String, String> exclusions) {
 		List<String> inclusionCodes = new ArrayList<>(inclusions.values());
 		List<String> exclusionCodes = new ArrayList<>(exclusions.values());
-		List<String> inclusionTexts = new ArrayList<>(inclusions.keySet());
-		List<String> exclusionTexts = new ArrayList<>(exclusions.keySet());
-		return createNode(parent, chapter, label, code, nodeType, icdNodeUsage, inclusionCodes, exclusionCodes, inclusionTexts, exclusionTexts);
+		List<String> inclusionStrings = new ArrayList<>(inclusions.keySet());
+		List<String> exclusionStrings = new ArrayList<>(exclusions.keySet());
+		return createNode(parent, chapter, label, code, nodeType, icdNodeUsage, inclusionCodes, exclusionCodes, inclusionStrings, exclusionStrings);
 	}
 
 	public Element getSgmlElement()
