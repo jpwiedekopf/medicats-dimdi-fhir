@@ -42,12 +42,13 @@ public class MedicatsTest
         System.out.printf("\t\tcodes=[%s]%n", targetNode.getExclusions(nodeWalker::getNodesBySudoCode).map(OpsNode::getCode).collect(Collectors.joining("; ")));
         System.out.printf("\t\tstrings=[%s]%n", String.join("; ", targetNode.getExclusionStrings()));
         System.out.printf("\tHints=[%s]%n", String.join("; ", targetNode.getHints()));
+        System.out.printf("\tAmtlich=[%s]%n", targetNode.isAmtl());
     }
 
     @SuppressWarnings("unused")
     private static void testIcd() {
         System.out.println("ICD-10-GM Test");
-        System.setProperty("dimdi.files.path", "Y:\\Terminology-Resources\\ICD-10-GM");
+        System.setProperty("dimdi.files.path", "Y:\\Terminology-Resources\\ICD10GM");
         IcdService icdService = IcdService.getService();
         IcdNodeFactory nodeFactory = icdService.getNodeFactory("icd10gm2004");
         IcdNodeWalker nodeWalker = nodeFactory.createNodeWalker();

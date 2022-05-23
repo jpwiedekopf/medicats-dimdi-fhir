@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 
 public class SgmlChapterReader
 {
-	private static Map<String, String> cleanupMap = new LinkedHashMap<>();
+	private static final Map<String, String> cleanupMap = new LinkedHashMap<>();
 
 	static
 	{
@@ -97,6 +97,7 @@ public class SgmlChapterReader
 		cleanupMap.put("&yuml;", "y");
 		cleanupMap.put("&dagger;", "+");
 		cleanupMap.put("&ast;", "*");
+		cleanupMap.put("&aster;", "*");
 		cleanupMap.put("&deg;", "º");
 		cleanupMap.put("&alpha;", "alpha");
 		cleanupMap.put("&beta;", "beta");
